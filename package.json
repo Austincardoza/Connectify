@@ -1,10 +1,10 @@
 {
   "name": "connectify",
   "version": "1.0.0",
-  "description": "",
+  "description": "An Online Meetup platform",
   "main": "index.js",
   "scripts": {
-    "start":"node server"
+    "start": "node server"
   },
   "author": "",
   "license": "ISC",

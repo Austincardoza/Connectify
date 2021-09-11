@@ -15,7 +15,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
     <script>
         $(function(){
-            const urlParams =new URLSearchParams(window.location.search);
+            // locates url
+            const urlParams = new URLSearchParams(window.location.search);
+            // gets meeting_id
             var meeting_id= urlParams.get('meetingID');
             user_id= window.prompt('Enter your userid');
 
