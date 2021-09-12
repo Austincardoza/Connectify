@@ -1,6 +1,8 @@
 var AppProcess = (function(){
-    var peers_connection_ids = []
-    var peers_connection = []
+    var peers_connection_ids = [];
+    var peers_connection = [];
+    var remote_vid_stream = [];
+    var remote_aud_stream = [];
     var serverProcess;
     function _init(SDP_function,my_connid){
         serverProcess = SDP_function;
@@ -30,9 +32,37 @@ var AppProcess = (function(){
                 connid)
             }
         }
-        connection.ontrack = function(event){};
+        connection.ontrack = function(event){
+            if(!remote_vid_stream[connid]){
+                remote_vid_stream[connd]=new MediaStream();
+            }
+            if(!remote_aud_stream[connid]){
+                remote_aud_stream[connd]=new MediaStream();
+            }
+
+            if(event.track.kind == "video"){
+                remote_vid_stream[connid].getVideoTracks().forEach((t)=>remote_vid_stream[connid].removeTrack(t));
+                remote_vid_stream[connid].addTrack(event.track)
+                var remoteVideoPlayer=document.getElementById("v_"+connid);
+                remoteVideoPlayer.srcObject=null;
+                remoteVideoPlayer.srcObject=remote_vid_stream[connid];
+                remoteVideoPlayer.load();
+            }else if(event.audio.kind =="audio"){
+                remote_aud_stream[connid].getAudioTracks().forEach((t)=>remote_aud_stream[connid].removeTrack(t));
+                remote_aud_stream[connid].addTrack(event.track)
+                var remoteAudioPlayer=document.getElementById("a_"+connid);
+                remoteAudioPlayer.srcObject=null;
+                remoteAudioPlayer.srcObject=remote_aud_stream[connid];
+                remoteAudioPlayer.load();
+
+            }
+
+
+        };
         peers_connection_ids[connid] = connid;
         peers_connection[connid] = connection;
+
+        return connection
     }
     function setOffer(connid){
         var connection = peers_connection[connid];
@@ -45,10 +75,19 @@ var AppProcess = (function(){
     return{
         setNewConnection:async function(connid){
             await setConnection(connid);
-        }
-    }
+        },
+        init:async function(SDP_function,my_connid){
+            await _init(SDP_function,my_connid);
+
+        },
+        processClientFunc:async function(SDP_function,my_connid){
+            await SDPProcess(data,from_connid);
+
+        },
+    };
     
-})
+    
+})();
 
 var MyApp=(function(){
     var socket=null;
@@ -86,6 +125,9 @@ var MyApp=(function(){
         addUser(data.other_user_id,data.connId);
         AppProcess.setNewConnection(data.connId);
 
+      });
+      socket.on("SDPProcess",async function(data){
+          await AppProcess.processClientFunc(data.message,data.from_connid);
       })
 
     }

@@ -32,4 +32,10 @@ io.on("connection",(socket)=>{
 
 
     })
+    socket.on("SDPProcess", (data)=>{
+        socket.to(data.to_connid).emit("SDPProcess",{
+            message:data.message,
+            from_connid:socket.id,
+        })
+    })
 });
