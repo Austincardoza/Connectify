@@ -15,6 +15,7 @@ var AppProcess = (function () {
     }
     var video_st=video_states.None;
     var videoCamTrack;
+    var rtp_vid_senders = [];
     async function _init(SDP_function, my_connid) {
         serverProcess = SDP_function;
         my_connection_id = my_connid;
@@ -22,7 +23,7 @@ var AppProcess = (function () {
         local_div=document.getElementById("localVideoPlayer");
     }
     function eventProcess(){
-        $("#miceMuteUnmite").on("click",async function(){
+        $("#miceMuteUnmute").on("click",async function(){
             if(!audio){
                 await loadAudio();
             }
@@ -61,6 +62,27 @@ var AppProcess = (function () {
         })
 
     }
+    function connection_status(connection){
+        if(connection && 
+            (connection.connectionState == "new" || 
+            connection.connectionState == "connecting" || 
+            connection.connectionState == "connected")){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    async function updateMediaSenders(track,rtp_senders){
+        for(var con_id in peers_connection_ids){
+            if(connection_status(peers_connection[con_id])){
+                if(rtp_senders[con_id] && rtp_senders[con_id].track){
+                    rtp_senders[con_id].replaceTrack(track);
+                }else{
+                    rtp_senders[con_id] = peers_connection[con_id].addTrack(track);
+                }
+            }
+        }
+    }
     async function videoProcess(newVideoState){
         try{
             var vstream=null;
@@ -85,7 +107,7 @@ var AppProcess = (function () {
                 videoCamTrack=vstream.getVideoTracks()[0];
                 if(videoCamTrack){
                     local_div.srcObject=new MediaStream([videoCamTrack]);
-                    
+                    updateMediaSenders(videoCamTrack, rtp_vid_senders);
                 }
             }
 
@@ -152,9 +174,16 @@ var AppProcess = (function () {
         peers_connection_ids[connid] = connid;
         peers_connection[connid] = connection;
 
-        return connection
+        if(video_st == video-states.Camera || video_st == video-states.ScreenShare){
+            if(videoCamTrack){
+                updateMediaSenders(videoCamTrack, rtp_vid_senders)
+            }
+        }
+        
+        return connection;
+        
     }
-    function setOffer(connid) {
+    async function setOffer(connid) {
         var connection = peers_connection[connid];
         var offer = await connection.createOffer();
         await connection.setLocalDescription(offer);
@@ -213,6 +242,9 @@ var MyApp = (function () {
     function init(uid, mid) {
         user_id = uid;
         meeting_id = mid;
+        $("#meetingContainer").show();
+        $("#me h2").text(user_id+"(Me)");
+        document.title = user_id;
         event_process_for_signalling_server();
     }
 
@@ -247,7 +279,7 @@ var MyApp = (function () {
 
 
         });
-        socket.on("imform_me_about_other_user", function (other_users) {
+        socket.on("inform_me_about_other_user", function(other_users) {
             addUser(data.other_user_id, data.connId);
             AppProcess.setNewConnection(data.connId);
 
