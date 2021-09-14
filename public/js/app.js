@@ -270,18 +270,17 @@ var MyApp = (function () {
         })
 
         socket.on("inform_others_about_me", function (data) {
+            addUser(data.other_user_id, data.connId);
+            AppProcess.setNewConnection(data.connId);
+            
+        });
+        socket.on("inform_me_about_other_user", function(other_users) {
             if (other_users) {
                 for (var i = 0; i < other_users.length; i++) {
                     addUser(other_users[i].user_id, other_users[i].connectionId)
                     AppProcess.setNewConnection(other_users[i].connectionId);
                 }
             }
-
-
-        });
-        socket.on("inform_me_about_other_user", function(other_users) {
-            addUser(data.other_user_id, data.connId);
-            AppProcess.setNewConnection(data.connId);
 
         });
         socket.on("SDPProcess", async function (data) {
