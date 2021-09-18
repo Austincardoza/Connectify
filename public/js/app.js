@@ -346,17 +346,21 @@ var MyApp = (function () {
         })
         socket.on("inform_other_about_disconnected_user", function (data) {
             $("#" + data.connId).remove();
-            AppProcess.closeConnection(data.connId);
+            $(".participant-count").text(data.uNumber);
+            $("#participant_"+data.connId+"").remove();
+            AppProcess.closeConnectionCall(data.connId);
         })
         socket.on("inform_others_about_me", function (data) {
-            addUser(data.other_user_id, data.connId);
+            addUser(data.other_user_id, data.connId,data.userNumber);
             AppProcess.setNewConnection(data.connId);
 
         });
         socket.on("inform_me_about_other_user", function (other_users) {
+            var userNumber = other_users.length;
+            var userNumb = userNumber + 1;
             if (other_users) {
                 for (var i = 0; i < other_users.length; i++) {
-                    addUser(other_users[i].user_id, other_users[i].connectionId)
+                    addUser(other_users[i].user_id, other_users[i].connectionId,userNumb)
                     AppProcess.setNewConnection(other_users[i].connectionId);
                 }
             }
@@ -398,7 +402,7 @@ var MyApp = (function () {
     }
 
 
-    function addUser(other_user_id, connId) {
+    function addUser(other_user_id, connId, userNum) {
         var newDivId = $("#otherTemplate").clone();
         newDivId = newDivId.attr("id", connId).addClass("other");
         newDivId.find("h2").text(other_user_id);
@@ -406,8 +410,36 @@ var MyApp = (function () {
         newDivId.find("audio").attr("id", "a_" + connId);
         newDivId.show();
         $("#divUsers").append(newDivId);
-
+              
+        $(".in-call-wrap-up").append('<div class="in-call-wrap d-flex justify-content-between align-items-center mb-3" id="participant_'+connId+'"> <div class="participant-img-name-wrap display-center cursor-pointer"> <div class="participant-img"> <img src="public/Assets//images/other.jpg" alt="" class="border border-secondary" style="height:40px; width:40px; border-radius: 50%;"> </div> <div class="participant-name ml-2"> '+other_user_id+' </div> </div> <div class="participant-action-wrap display-center"> <div class="participant-action-dot display-center mr-2 "> <span class="material-icons">more_vert</span> </div> <div class="participant-action-pin display-center mr-2 cursor-pointer"> <span class="material-icons">push_pin</span> </div> </div> </div>');
+        $(".participant-count").text(userNum);
     }
+    $(document).on("click", ".people-heading", function(){
+        $(".in-call-wrap-up").show(300);
+        $(".chat-show-wrap").hide(300);
+        $(this).addClass("active");
+        $(".chat-heading").removeClass("active");
+
+    });
+    $(document).on("click", ".chat-heading", function(){
+        $(".in-call-wrap-up").hide(300);
+        $(".chat-show-wrap").show(300);
+        $(this).addClass("active");
+        $(".people-heading").removeClass("active");
+    });
+    $(document).on("click", ".meeting-heading-cross", function(){
+       $(".g-right-details-wrap").hide(200);
+    });
+    $(document).on("click", ".top-left-participant-wrap", function(){
+        $(".g-right-details-wrap").show(200);
+        $(".in-call-wrap-up").show(300);
+        $(".chat-show-wrap").hide(300);
+     });
+     $(document).on("click", ".top-left-chat-wrap", function(){
+        $(".g-right-details-wrap").show(200);
+        $(".in-call-wrap-up").hide(300);
+        $(".chat-show-wrap").show(300);
+     });
 
 
     return {
