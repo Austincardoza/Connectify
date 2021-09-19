@@ -347,11 +347,11 @@ var MyApp = (function () {
         socket.on("inform_other_about_disconnected_user", function (data) {
             $("#" + data.connId).remove();
             $(".participant-count").text(data.uNumber);
-            $("#participant_"+data.connId+"").remove();
+            $("#participant_" + data.connId + "").remove();
             AppProcess.closeConnectionCall(data.connId);
         })
         socket.on("inform_others_about_me", function (data) {
-            addUser(data.other_user_id, data.connId,data.userNumber);
+            addUser(data.other_user_id, data.connId, data.userNumber);
             AppProcess.setNewConnection(data.connId);
 
         });
@@ -360,7 +360,7 @@ var MyApp = (function () {
             var userNumb = userNumber + 1;
             if (other_users) {
                 for (var i = 0; i < other_users.length; i++) {
-                    addUser(other_users[i].user_id, other_users[i].connectionId,userNumb)
+                    addUser(other_users[i].user_id, other_users[i].connectionId, userNumb)
                     AppProcess.setNewConnection(other_users[i].connectionId);
                 }
             }
@@ -386,7 +386,7 @@ var MyApp = (function () {
 
     function eventHandeling() {
         $("#btnsend").on("click", function () {
-            var msgData=$("#msgbox").val();
+            var msgData = $("#msgbox").val();
             socket.emit("sendMessage", msgData);
             var time = new Date();
             var lTime = time.toLocaleString("en-US", {
@@ -398,6 +398,13 @@ var MyApp = (function () {
             $("#messages").append(div);
             $("#msgbox").val("");
         });
+        var url=window.location.href;
+        $(".meeting_url").text(url);
+
+        $("#divUsers").on("dblclick","video",function(){
+            this.requestFullscreen();
+
+        })
 
     }
 
@@ -410,36 +417,99 @@ var MyApp = (function () {
         newDivId.find("audio").attr("id", "a_" + connId);
         newDivId.show();
         $("#divUsers").append(newDivId);
-              
-        $(".in-call-wrap-up").append('<div class="in-call-wrap d-flex justify-content-between align-items-center mb-3" id="participant_'+connId+'"> <div class="participant-img-name-wrap display-center cursor-pointer"> <div class="participant-img"> <img src="public/Assets//images/other.jpg" alt="" class="border border-secondary" style="height:40px; width:40px; border-radius: 50%;"> </div> <div class="participant-name ml-2"> '+other_user_id+' </div> </div> <div class="participant-action-wrap display-center"> <div class="participant-action-dot display-center mr-2 "> <span class="material-icons">more_vert</span> </div> <div class="participant-action-pin display-center mr-2 cursor-pointer"> <span class="material-icons">push_pin</span> </div> </div> </div>');
+
+        $(".in-call-wrap-up").append('<div class="in-call-wrap d-flex justify-content-between align-items-center mb-3" id="participant_' + connId + '"> <div class="participant-img-name-wrap display-center cursor-pointer"> <div class="participant-img"> <img src="public/Assets//images/other.jpg" alt="" class="border border-secondary" style="height:40px; width:40px; border-radius: 50%;"> </div> <div class="participant-name ml-2"> ' + other_user_id + ' </div> </div> <div class="participant-action-wrap display-center"> <div class="participant-action-dot display-center mr-2 "> <span class="material-icons">more_vert</span> </div> <div class="participant-action-pin display-center mr-2 cursor-pointer"> <span class="material-icons">push_pin</span> </div> </div> </div>');
         $(".participant-count").text(userNum);
     }
-    $(document).on("click", ".people-heading", function(){
+    $(document).on("click", ".people-heading", function () {
         $(".in-call-wrap-up").show(300);
         $(".chat-show-wrap").hide(300);
         $(this).addClass("active");
         $(".chat-heading").removeClass("active");
 
     });
-    $(document).on("click", ".chat-heading", function(){
+    $(document).on("click", ".chat-heading", function () {
         $(".in-call-wrap-up").hide(300);
         $(".chat-show-wrap").show(300);
         $(this).addClass("active");
         $(".people-heading").removeClass("active");
     });
-    $(document).on("click", ".meeting-heading-cross", function(){
-       $(".g-right-details-wrap").hide(200);
+    $(document).on("click", ".meeting-heading-cross", function () {
+        $(".g-right-details-wrap").hide(200);
     });
-    $(document).on("click", ".top-left-participant-wrap", function(){
+    $(document).on("click", ".top-left-participant-wrap", function () {
+        $(".people-heading").addClass("active");
+        $(".chat-heading").removeClass("active");
         $(".g-right-details-wrap").show(200);
         $(".in-call-wrap-up").show(300);
         $(".chat-show-wrap").hide(300);
-     });
-     $(document).on("click", ".top-left-chat-wrap", function(){
+    });
+    $(document).on("click", ".top-left-chat-wrap", function () {
+        $(".people-heading").removeClass("active");
+        $(".chat-heading").addClass("active");
         $(".g-right-details-wrap").show(200);
         $(".in-call-wrap-up").hide(300);
         $(".chat-show-wrap").show(300);
-     });
+    });
+    $(document).on("click", ".end-call-wrap", function () {
+        $(".top-box-show").css({
+            "display": "block"
+        }).html('<div class="top-box align-vertical-middle profile-dialogue-show"> <h4 class="mt-3" style="text-align:center; color:white;">Leave meeting</h4><hr> <div class="call-leave-cancel-action d-flex justify-content-center align-items-center w-100"> <a href="/action.html"><button class="call-leave-action btn btn-danger mr-5">Leave</button></a> <button class="call-cancel-action btn btn-secondary">Cancel</button> </div> </div>');
+    });
+    $(document).mouseup(function(e){
+        var container=new Array();
+        container.push($(".top-box-show"));
+        $.each(container,function(key,value){
+            if(!$(value).is(e.target) && $(value).has(e.target).length==0){
+                $(value).empty();
+            }
+
+        })
+    })
+    $(document).mouseup(function(e){
+        var container=new Array();
+        container.push($(".g-details"));
+        container.push($(".g-right-details-wrap"));
+        $.each(container,function(key,value){
+            if(!$(value).is(e.target) && $(value).has(e.target).length==0){
+                $(value).hide(300);
+            }
+
+        })
+    })
+    
+$(document).on("click",".call-cancel-action",function(){
+    $('.top-box-show').html('')
+});
+
+$(document).on("click",".copy_info",function(){
+    var $temp=$("<input>");
+    $("body").append($temp);
+    $temp.val($(".meeting_url").text()).select();
+    document.execCommand("copy");
+    $temp.remove();
+    $(".link-conf").show();
+    setTimeout(function(){
+        $(".link-conf").hide();
+
+    },3000);
+})
+$(document).on("click",".meeting-details-button",function(){
+    $(".g-details").slideDown(300);
+});
+$(document).on("click",".g-details-heading-attachment",function(){
+    $(".g-details-heading-show").hide();
+    $(".g-details-heading-show-attachment").show();
+    $(this).addClass('active');
+    $(".g-details-heading-detail").removeClass('active');
+});
+$(document).on("click",".g-details-heading-detail",function(){
+    $(".g-details-heading-show").show();
+    $(".g-details-heading-show-attachment").hide();
+    $(this).addClass('active');
+    $(".g-details-heading-attachment").removeClass('active');
+});
+
 
 
     return {
