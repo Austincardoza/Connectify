@@ -343,18 +343,30 @@ var MyApp = (function () {
                     })
                 }
             }
-        })
+        });
+
         socket.on("inform_other_about_disconnected_user", function (data) {
             $("#" + data.connId).remove();
             $(".participant-count").text(data.uNumber);
             $("#participant_" + data.connId + "").remove();
             AppProcess.closeConnectionCall(data.connId);
-        })
+        });
+
         socket.on("inform_others_about_me", function (data) {
             addUser(data.other_user_id, data.connId, data.userNumber);
             AppProcess.setNewConnection(data.connId);
 
         });
+        socket.on("showFileMessage",function(data) {
+            var time = new Date();
+            var lTime = time.toLocaleString("en-US",{
+                hour:"numeric",
+                minute:"numeric",
+                hour12:true
+            })
+            var attachFileAreaForOther = document.querySelector(".show-attach-file");
+            attachFileAreaForOther.innerHTML += "<div class='left-align' style='display:flex;align-items:center;'><img src='public/assets/images/other.jpg' style='height:40px;width:40px' class='caller-image circle'><div style='font-weight:600;margin:0 5px;'>"+data.username+"</div>:<div><a style='color:#007bff;' href='"+data.filePath+"' download>"+data.fileName+"</a></div></div><br/>";
+        })
         socket.on("inform_me_about_other_user", function (other_users) {
             var userNumber = other_users.length;
             var userNumb = userNumber + 1;
@@ -509,7 +521,45 @@ $(document).on("click",".g-details-heading-detail",function(){
     $(this).addClass('active');
     $(".g-details-heading-attachment").removeClass('active');
 });
+var base_url = window.location.origin;
+$(document).on("change",".custom-file-input",function(e){
+    var fileName = $(this).val().split("\\").pop();
+    $(this).siblings(".custom-file-label").addClass("selected").html(fileName); 
+})
+$(document).on("click",".share-attach",function(e){
+    e.preventDefault();
+    var att_img = $("#customFile").prop('files')[0];
+    var formData = new FormData();
+    formData.append("zipfile",att_img);
+    formData.append("meeting_id",meeting_id);
+    formData.append("username",user_id);
+    console.log(formData);
+    $.ajax({
+        url: base_url+"/attachimg",
+        type:"POST",
+        data: formData,
+        contentType:false,
+        processData:false,
+        success:function(response){
+            console.log(response);
+        },
+        error:function(){
+            console.log("error");
+        }
+    });
+    var attachFileArea = document.querySelector(".show-attach-file");
+    var attachFileName = $("#customFile").val().split("\\").pop();
+    var attachFilePath = "public/attachment/"+meeting_id+"/"+attachFileName;
+    attachFileArea.innerHTML += "<div class='left-align' style='display:flex; align-items:center;'><img src='public/assets/images/other.jpg' style='height:40px;width:40px;' class='caller-image circle'><div style='font-weight:600;margin:0 5px;'>"+user_id+"</div>:<div><a style='color:#007bff;' href='"+attachFilePath+"' download>"+attachFileName+"</a></div></div><br/>";
+    $("label.custom-file-label").text("");
+    socket.emit("fileTransferToOther",{
+        username:user_id,
+        meetingid:meeting_id,
+        filePath:attachFilePath,
+        fileName:attachFileName,
+    });
 
+    });
 
 
     return {
