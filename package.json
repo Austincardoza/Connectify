@@ -4,11 +4,12 @@
   "description": "An Online Meetup platform",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon server"
+    "start": "node server"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "express-fileupload": "^1.2.1",
     "socket.io": "^4.1.3"
