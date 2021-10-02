@@ -2,10 +2,21 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Compiler</title>
+    <style>
+        #run {
+            border-radius: 50;
+        }
+
+        #run:hover {
+            background-color: #38aa38;
+            color: white;
+            box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
+        }
+    </style>
 </head>
 
-<body style="background-color: #eee; font-family: monospace; margin: 8px;" >
-    
+<body style="background-color: rgb(238, 169, 113); font-family: monospace; margin: 8px;">
+
 
     <h4>Source Code</h4>
     <textarea id="source" style="width: calc(50% - 8px);font-size: 15px; height: 40%; resize: vertical;">
@@ -24,7 +35,7 @@
     </select>
 
     <h4>Input</h4>
-    <textarea id="input" style="width: calc(50% - 8px); height: 10%; resize: vertical;">John</textarea>
+    <textarea id="input" style="width: calc(50% - 8px); height: 9%; resize: vertical;">Enter input here</textarea>
 
     <h4>Expected Output<sub><small>(optional)</small></sub></h4>
     <textarea id="expected-output" style="width: calc(50% - 8px); height: 10%; resize: vertical;"></textarea>
@@ -32,9 +43,10 @@
     </br></br>
     <button id="run" onclick="run()">▶️ Run (Ctrl + Enter)</button>
 
-    
 
-    <textarea readonly id="output" style="width: 50%; height: 100%; position: fixed; top: 0; right: 0; resize: none;">Output</textarea>
+
+    <textarea readonly id="output"
+        style="width: 50%; height: 100%; position: fixed; top: 2; right: 0; resize: none;">Output</textarea>
 
     <script type="text/javascript">
         API_KEY = "29db1e82b6msh885841498e57a74p11b483jsna9b3f3427d19"; // Get yours for free at https://judge0.com/ce or https://judge0.com/extra-ce
@@ -74,16 +86,16 @@
                 type: "GET",
                 headers: {
                     "x-rapidapi-host": "judge0-ce.p.rapidapi.com",
-	                "x-rapidapi-key": API_KEY
+                    "x-rapidapi-key": API_KEY
                 },
                 success: function (data, textStatus, jqXHR) {
                     if ([1, 2].includes(data["status"]["id"])) {
                         $("#output").val($("#output").val() + "\nℹ️ Status: " + data["status"]["description"]);
-                        setTimeout(function() { check(token) }, 1000);
+                        setTimeout(function () { check(token) }, 1000);
                     }
                     else {
                         var output = [decode(data["compile_output"]), decode(data["stdout"])].join("\n").trim();
-                        $("#output").val(`${data["status"]["id"] != "3" ? "🔴" : "🟢"} ${data["status"]["description"]}\n${output}`);
+                        $("#output").val(`${data["status"]["id"] != "3" ? "❌" : "✔️"} ${data["status"]["description"]}\n${output}`);
                         $("#run").prop("disabled", false);
                     }
                 },
@@ -106,7 +118,7 @@
                 contentType: "application/json",
                 headers: {
                     "x-rapidapi-host": "judge0-ce.p.rapidapi.com",
-	                "x-rapidapi-key": API_KEY
+                    "x-rapidapi-key": API_KEY
                 },
                 data: JSON.stringify({
                     "language_id": language_to_id[$("#lang").val()],
@@ -115,9 +127,9 @@
                     "expected_output": encodedExpectedOutput,
                     "redirect_stderr_to_stdout": true
                 }),
-                success: function(data, textStatus, jqXHR) {
+                success: function (data, textStatus, jqXHR) {
                     $("#output").val($("#output").val() + "\n🎉 Submission created.");
-                    setTimeout(function() { check(data["token"]) }, 2000);
+                    setTimeout(function () { check(data["token"]) }, 2000);
                 },
                 error: errorHandler
             });

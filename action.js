@@ -17,27 +17,7 @@ navigator.mediaDevices.getUserMedia(mediaConstraints)
     .then(localstream => {
         videoCont.srcObject = localstream;
     })
-//-------------------------------
 
-//
-
-//creation of room
-
-
-
-//empty roomcode error condition
-// codeCont.addEventListener('change', (e) => {
-    
-//     e.preventDefault();
-    
-//     if (codeCont.value.trim() !== "") {
-//         codeCont.classList.remove('roomcode-error');
-//         return;
-//     }
-// })
-
-
-// cam initailization and on/off condition onclick
 cam.addEventListener('click', () => {
     if (camAllowed) {
         mediaConstraints = { video: false, audio: micAllowed ? true : false };
