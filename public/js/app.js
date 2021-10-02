@@ -571,3 +571,9 @@ $(document).on("click",".share-attach",function(e){
 
 
 })();
+
+function openWin() {
+
+    myWindow = window.open("compiler.html", "myWindow", "width=1000,height=700");   // Opens a new window
+
+}
