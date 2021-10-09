@@ -11,7 +11,10 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    color: rgb(108, 107, 107) !important;
+    color: black !important;
+  }
+  .display-center>h2{
+    color: white;
   }
   .home-wrap{
     background-color:rgb(31,30,30);
