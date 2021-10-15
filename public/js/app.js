@@ -34,7 +34,7 @@ var AppProcess = (function () {
             if (isAudioMute) {
                 audio.enabled = true;
                 $(this).html("<span class='material-icons' style='width:100%;'>mic</span>");
-                updateMediaSender(audio, rtp_aud_senders);
+                updateMediaSenders(audio, rtp_aud_senders);
             }
             else {
                 audio.enabled = false;
@@ -99,7 +99,7 @@ var AppProcess = (function () {
         for (var con_id in peers_connection_ids) {
             if (rtp_senders[con_id] && connection_status(peers_connection[con_id]
             )) {
-                peers_connection[con_id].removeTrack(rtpSenders[con_id]);
+                peers_connection[con_id].removeTrack(rtp_senders[con_id]);
                 rtp_senders[con_id] = null;
             }
         }
@@ -212,7 +212,7 @@ var AppProcess = (function () {
                 remoteVideoPlayer.srcObject = null;
                 remoteVideoPlayer.srcObject = remote_vid_stream[connid];
                 remoteVideoPlayer.load();
-            } else if (event.audio.kind == "audio") {
+            } else if (event.track.kind == "audio") {
                 remote_aud_stream[connid].getAudioTracks().forEach((t) => remote_aud_stream[connid].removeTrack(t));
                 remote_aud_stream[connid].addTrack(event.track)
                 var remoteAudioPlayer = document.getElementById("a_" + connid);
@@ -430,7 +430,7 @@ var MyApp = (function () {
         newDivId.show();
         $("#divUsers").append(newDivId);
 
-        $(".in-call-wrap-up").append('<div class="in-call-wrap d-flex justify-content-between align-items-center mb-3" id="participant_' + connId + '"> <div class="participant-img-name-wrap display-center cursor-pointer"> <div class="participant-img"> <img src="public/Assets//images/other.jpg" alt="" class="border border-secondary" style="height:40px; width:40px; border-radius: 50%;"> </div> <div class="participant-name ml-2"> ' + other_user_id + ' </div> </div> <div class="participant-action-wrap display-center"> <div class="participant-action-dot display-center mr-2 "> <span class="material-icons">more_vert</span> </div> <div class="participant-action-pin display-center mr-2 cursor-pointer"> <span class="material-icons">push_pin</span> </div> </div> </div>');
+        $(".in-call-wrap-up").append('<div class="in-call-wrap d-flex justify-content-between align-items-center mb-3" id="participant_' + connId + '"> <div class="participant-img-name-wrap display-center cursor-pointer"> <div class="participant-img"> <img src="public/Assets//images/other.jpg" alt="" class="border border-secondary" style="height:40px; width:40px; border-radius: 50%;"> </div> <div class="participant-name ml-2"> ' + other_user_id + ' </div> </div> <div class="participant-action-wrap display-center"> <div class="participant-action-dot display-center mr-2 ">  </div> <div class="participant-action-pin display-center mr-2 cursor-pointer"> </div> </div> </div>');
         $(".participant-count").text(userNum);
     }
     $(document).on("click", ".people-heading", function () {
