@@ -17,10 +17,13 @@
     color: white;
   }
   .home-wrap{
-    background-color:rgb(31,30,30);
+    background-color:rgb(220, 218, 245);
+  }
+  .g-right-details-wrap{
+    background-color: rgb(114, 110, 174)
   }
   .g-top{
-    height:90vh;
+    height:89vh;
     position:relative;
   }
   .video-wrap{
@@ -57,10 +60,10 @@
     font-size:15px;
   }
   .g-bottom{
-    /* margin: 0 -10px !important; */
-    padding:0 20px;
+    padding:0 18px;
     box-shadow: 0 0 5px black;
     z-index: 2;
+    margin-top: 7px;
   }
   .bottom-left{
     position: relative;
@@ -84,7 +87,7 @@
   }
   video{
       border:1px solid gray;
-      width:500px;
+      width:300px;
   }
   .active{
     background-color:#00808047;
